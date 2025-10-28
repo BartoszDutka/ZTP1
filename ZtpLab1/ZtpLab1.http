@@ -1,6 +1,0 @@
-@ZtpLab1_HostAddress = http://localhost:5048
-
-GET {{ZtpLab1_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
