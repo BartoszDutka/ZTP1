@@ -10,6 +10,7 @@ namespace ZtpLab1.Data
     public class MongoDbContext
     {
         private readonly IMongoCollection<Product> _products;
+        private readonly IMongoCollection<ForbiddenWord> _forbiddenWords;
 
         /// <summary>
         /// Konstruktor inicjalizujący połączenie z MongoDB i konfigurujący kolekcje.
@@ -20,14 +21,25 @@ namespace ZtpLab1.Data
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
             _products = database.GetCollection<Product>(settings.ProductsCollectionName);
+            _forbiddenWords = database.GetCollection<ForbiddenWord>(settings.ForbiddenWordsCollectionName);
 
             // Utworzenie unikalnego indeksu na polu Name przy starcie
             // To wymusza unikalność nazw produktów po stronie bazy danych
             // zgodnie z wymaganiami Laboratorium 1 (ocena 3.0)
-            var indexKeysDefinition = Builders<Product>.IndexKeys.Ascending(p => p.Name);
-            var indexOptions = new CreateIndexOptions { Unique = true };
-            var indexModel = new CreateIndexModel<Product>(indexKeysDefinition, indexOptions);
-            _products.Indexes.CreateOne(indexModel);
+            var productIndexKeysDefinition = Builders<Product>.IndexKeys.Ascending(p => p.Name);
+            var productIndexOptions = new CreateIndexOptions { Unique = true };
+            var productIndexModel = new CreateIndexModel<Product>(productIndexKeysDefinition, productIndexOptions);
+            _products.Indexes.CreateOne(productIndexModel);
+
+            // Utworzenie unikalnego indeksu na polu Word w kolekcji zabronionych słów
+            // To zapewnia unikalność zabronionych słów (case-insensitive)
+            var forbiddenWordIndexKeysDefinition = Builders<ForbiddenWord>.IndexKeys.Ascending(fw => fw.Word);
+            var forbiddenWordIndexOptions = new CreateIndexOptions { 
+                Unique = true,
+                Collation = new Collation("pl", strength: CollationStrength.Primary) // Case-insensitive
+            };
+            var forbiddenWordIndexModel = new CreateIndexModel<ForbiddenWord>(forbiddenWordIndexKeysDefinition, forbiddenWordIndexOptions);
+            _forbiddenWords.Indexes.CreateOne(forbiddenWordIndexModel);
         }
 
         /// <summary>
@@ -36,12 +48,124 @@ namespace ZtpLab1.Data
         public IMongoCollection<Product> Products => _products;
 
         /// <summary>
+        /// Dostęp do kolekcji zabronionych słów.
+        /// </summary>
+        public IMongoCollection<ForbiddenWord> ForbiddenWords => _forbiddenWords;
+
+        /// <summary>
+        /// Sprawdza czy nazwa produktu zawiera zabronione słowa.
+        /// </summary>
+        /// <param name="productName">Nazwa produktu do sprawdzenia</param>
+        /// <returns>Lista znalezionych zabronionych słów lub pusta lista</returns>
+        public async Task<List<string>> GetForbiddenWordsInNameAsync(string productName)
+        {
+            if (string.IsNullOrWhiteSpace(productName))
+                return new List<string>();
+
+            // Pobieramy aktywne zabronione słowa z bazy
+            var forbiddenWords = await _forbiddenWords
+                .Find(fw => fw.IsActive)
+                .Project(fw => fw.Word)
+                .ToListAsync();
+
+            var foundForbiddenWords = new List<string>();
+            var productNameLower = productName.ToLowerInvariant();
+
+            // Sprawdzamy czy nazwa produktu zawiera któreś z zabronionych słów
+            foreach (var word in forbiddenWords)
+            {
+                if (productNameLower.Contains(word.ToLowerInvariant()))
+                {
+                    foundForbiddenWords.Add(word);
+                }
+            }
+
+            return foundForbiddenWords;
+        }
+
+        /// <summary>
+        /// Metoda dodająca przykładowe produkty i zabronione słowa do bazy danych.
+        /// Nie sprawdza duplikatów zapytaniem - pozwala bazie wymusić unikalność.
+        /// </summary>
+        public async Task SeedDataAsync()
+        {
+            Console.WriteLine("Rozpoczynam seed bazy danych...");
+            
+            // Seed zabronionych słów
+            await SeedForbiddenWordsAsync();
+            
+            // Seed produktów
+            await SeedProductsAsync();
+        }
+
+        /// <summary>
+        /// Metoda dodająca przykładowe zabronione słowa do bazy danych.
+        /// </summary>
+        private async Task SeedForbiddenWordsAsync()
+        {
+            Console.WriteLine("Dodaję zabronione słowa...");
+            var forbiddenWords = new[]
+            {
+                new ForbiddenWord
+                {
+                    Word = "spam",
+                    Reason = "Słowo związane ze spamem",
+                    IsActive = true
+                },
+                new ForbiddenWord
+                {
+                    Word = "fake",
+                    Reason = "Słowo sugerujące fałszywość",
+                    IsActive = true
+                },
+                new ForbiddenWord
+                {
+                    Word = "hack",
+                    Reason = "Słowo związane z nielegalną działalnością",
+                    IsActive = true
+                },
+                new ForbiddenWord
+                {
+                    Word = "virus",
+                    Reason = "Słowo związane z malware",
+                    IsActive = true
+                },
+                new ForbiddenWord
+                {
+                    Word = "illegal",
+                    Reason = "Słowo sugerujące nielegalność",
+                    IsActive = true
+                }
+            };
+
+            foreach (var word in forbiddenWords)
+            {
+                try
+                {
+                    Console.WriteLine($"Dodaję zabronione słowo: {word.Word}");
+                    await _forbiddenWords.InsertOneAsync(word);
+                    Console.WriteLine($"Pomyślnie dodano zabronione słowo: {word.Word}");
+                }
+                catch (MongoWriteException ex) when (ex.WriteError?.Code == 11000)
+                {
+                    Console.WriteLine($"Zabronione słowo {word.Word} już istnieje w bazie");
+                    continue;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Błąd podczas dodawania zakazanego słowa {word.Word}: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// Metoda dodająca przykładowe produkty do bazy danych.
         /// Nie sprawdza duplikatów zapytaniem - pozwala bazie wymusić unikalność.
         /// </summary>
-        public async Task SeedProductsAsync()
+        private async Task SeedProductsAsync()
         {
-            Console.WriteLine("Rozpoczynam seed bazy danych...");
+            Console.WriteLine("Dodaję produkty...");
             var products = new[]
             {
                 new Product

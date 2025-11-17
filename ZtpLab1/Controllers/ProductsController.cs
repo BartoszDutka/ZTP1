@@ -25,7 +25,10 @@ namespace ZtpLab1.Controllers
         public ProductsController(MongoDbContext context)
         {
             _products = context.Products;
+            _context = context;
         }
+
+        private readonly MongoDbContext _context;
 
         /// <summary>
         /// GET /api/v1/products
@@ -84,6 +87,17 @@ namespace ZtpLab1.Controllers
                         GetPriceRangeMessage(product.Category) });
                 }
 
+                // Sprawdzenie zabronionych słów w nazwie produktu (ocena 3.5)
+                var forbiddenWords = await _context.GetForbiddenWordsInNameAsync(product.Name);
+                if (forbiddenWords.Any())
+                {
+                    return BadRequest(new { 
+                        message = "Naruszenie polityki nazywania produktów. " +
+                                 $"Nazwa zawiera zabronione słowa: {string.Join(", ", forbiddenWords)}",
+                        forbiddenWords = forbiddenWords
+                    });
+                }
+
                 // Próba zapisu do bazy (indeks unikalny na Name wyłapie duplikaty)
                 await _products.InsertOneAsync(product);
 
@@ -128,6 +142,17 @@ namespace ZtpLab1.Controllers
                 {
                     return BadRequest(new { message = $"Nieprawidłowa cena dla kategorii {product.Category}. " +
                         GetPriceRangeMessage(product.Category) });
+                }
+
+                // Sprawdzenie zabronionych słów w nazwie produktu (ocena 3.5)
+                var forbiddenWords = await _context.GetForbiddenWordsInNameAsync(product.Name);
+                if (forbiddenWords.Any())
+                {
+                    return BadRequest(new { 
+                        message = "Naruszenie polityki nazywania produktów. " +
+                                 $"Nazwa zawiera zabronione słowa: {string.Join(", ", forbiddenWords)}",
+                        forbiddenWords = forbiddenWords
+                    });
                 }
 
                 // Sprawdzenie czy produkt istnieje

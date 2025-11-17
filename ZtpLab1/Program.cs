@@ -4,10 +4,38 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Konfiguracja CORS dla komunikacji z frontendem
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "ZtpLab1 API", Version = "v1" });
+    c.SwaggerDoc("v1", new() 
+    { 
+        Title = "System Zarządzania Produktami - Laboratorium ZTP", 
+        Version = "v1"
+    });
+    
+    // Grupowanie endpoint-ów
+    c.TagActionsBy(api =>
+    {
+        if (api.ActionDescriptor.RouteValues["controller"]?.ToString() == "Products")
+            return new[] { "🛍️ Produkty (Ocena 3.0)" };
+        if (api.ActionDescriptor.RouteValues["controller"]?.ToString() == "ForbiddenWords")
+            return new[] { "🚫 Zabronione Słowa (Ocena 3.5)" };
+        return new[] { "Inne" };
+    });
+    
+    c.DocInclusionPredicate((name, api) => true);
 });
 
 // Konfiguracja MongoDB i kontekstu bazy danych
@@ -18,13 +46,13 @@ builder.Services.AddSingleton<MongoDbContext>();
 
 var app = builder.Build();
 
-// Seed bazy danych przykładowymi produktami
+// Seed bazy danych przykładowymi produktami i zabronionymi słowami
 // Ten kod uruchamia się przy starcie aplikacji i automatycznie wypełnia bazę
-// przykładowymi produktami, jeśli jeszcze nie istnieją
+// przykładowymi danymi, jeśli jeszcze nie istnieją
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
-    await context.SeedProductsAsync();
+    await context.SeedDataAsync();
 }
 
 // Configure the HTTP request pipeline.
@@ -33,12 +61,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZtpLab1 API V1");
-        c.RoutePrefix = string.Empty; // To sprawi, że Swagger UI będzie dostępny na stronie głównej
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "System Zarządzania Produktami V1");
+        c.RoutePrefix = string.Empty; // Swagger UI na stronie głównej
+        c.DocumentTitle = "ZTP Lab 1 - API Documentation";
+        c.DefaultModelsExpandDepth(-1); // Zwijanie modeli dla przejrzystości
+        c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);
+        c.EnableDeepLinking();
+        c.DisplayRequestDuration();
     });
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 app.MapControllers(); // Mapowanie kontrolerów
 

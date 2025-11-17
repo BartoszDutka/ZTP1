@@ -1059,31 +1059,29 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\bdutka\\.nuget\\packages\\": {},
+    "C:\\Users\\bdutka.DESKTOP-ECBS2TP\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\bdutka\\Documents\\ZTP1\\ZtpLab1\\ZtpLab1.csproj",
+      "projectUniqueName": "C:\\Users\\bdutka.DESKTOP-ECBS2TP\\Desktop\\ZTP1\\ZTP1\\ZtpLab1\\ZtpLab1.csproj",
       "projectName": "ZtpLab1",
-      "projectPath": "C:\\Users\\bdutka\\Documents\\ZTP1\\ZtpLab1\\ZtpLab1.csproj",
-      "packagesPath": "C:\\Users\\bdutka\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\bdutka\\Documents\\ZTP1\\ZtpLab1\\obj\\",
+      "projectPath": "C:\\Users\\bdutka.DESKTOP-ECBS2TP\\Desktop\\ZTP1\\ZTP1\\ZtpLab1\\ZtpLab1.csproj",
+      "packagesPath": "C:\\Users\\bdutka.DESKTOP-ECBS2TP\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\bdutka.DESKTOP-ECBS2TP\\Desktop\\ZTP1\\ZTP1\\ZtpLab1\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\bdutka\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\bdutka.DESKTOP-ECBS2TP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1140,7 +1138,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
