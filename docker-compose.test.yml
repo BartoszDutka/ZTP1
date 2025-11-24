@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mongodb-test:
+    image: mongo:7.0
+    container_name: mongodb-test
+    environment:
+      MONGO_INITDB_DATABASE: ProductManagementTestDb
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb-test-data:/data/db
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongodb-test-data:
+
+networks:
+  test-network:
+    driver: bridge

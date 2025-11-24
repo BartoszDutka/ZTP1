@@ -68,10 +68,14 @@ var app = builder.Build();
 // Seed bazy danych przykładowymi produktami i zabronionymi słowami
 // Ten kod uruchamia się przy starcie aplikacji i automatycznie wypełnia bazę
 // przykładowymi danymi, jeśli jeszcze nie istnieją
-using (var scope = app.Services.CreateScope())
+// Pomijamy seed w środowisku testowym
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var context = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
-    await context.SeedDataAsync();
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
+        await context.SeedDataAsync();
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -96,3 +100,6 @@ app.UseAuthorization();
 app.MapControllers(); // Mapowanie kontrolerów
 
 app.Run();
+
+// Udostępnienie klasy Program dla testów integracyjnych
+public partial class Program { }
