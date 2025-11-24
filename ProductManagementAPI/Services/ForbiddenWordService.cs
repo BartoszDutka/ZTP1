@@ -102,7 +102,7 @@ namespace ZtpLab1.Services
                 {
                     return ApiResponse<ForbiddenWord>.CreateError(
                         $"Zabronione słowo '{forbiddenWord.Word}' już istnieje.", 
-                        409 // Conflict
+                        409 // Konflikt
                     );
                 }
 
@@ -162,7 +162,7 @@ namespace ZtpLab1.Services
                 {
                     return ApiResponse<ForbiddenWord>.CreateError(
                         $"Zabronione słowo '{forbiddenWord.Word}' już istnieje.", 
-                        409 // Conflict
+                        409 // Konflikt
                     );
                 }
 

@@ -44,7 +44,7 @@ namespace ZtpLab1.BusinessRules.Product
                 var forbiddenWordsText = string.Join(", ", foundForbiddenWords);
                 errors.Add(new ValidationResult(
                     $"Naruszenie polityki nazywania produktów. Nazwa zawiera zabronione słowa: {forbiddenWordsText}.",
-                    new[] { nameof(product.Name) }
+                    [nameof(product.Name)]
                 ));
             }
 

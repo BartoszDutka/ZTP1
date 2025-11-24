@@ -4,7 +4,6 @@ namespace ZtpLab1.DataTransferObjects
 {
     /// <summary>
     /// DTO dla tworzenia nowego zakazanego słowa.
-    /// Używa nowoczesnych wzorców C# 11: 'required' keyword i 'init' accessors.
     /// </summary>
     public class CreateForbiddenWordDto
     {

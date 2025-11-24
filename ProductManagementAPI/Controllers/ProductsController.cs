@@ -9,7 +9,7 @@ namespace ZtpLab1.Controllers
     /// Implementuje REST API zgodnie z konwencją i wzorcami N-Layer Architecture.
     /// </summary>
     [ApiController]
-    [Route("api/v1/products")] // Wersjonowanie API w ścieżce
+    [Route("api/v1/products")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -29,7 +29,7 @@ namespace ZtpLab1.Controllers
         /// </summary>
         /// <returns>Lista produktów z podstawowymi informacjami</returns>
         [HttpGet]
-        public async Task<ActionResult<ApiResponse<IEnumerable<object>>>> GetProducts()
+        public async Task<ActionResult<ApiResponse<IEnumerable<Models.Product>>>> GetProducts()
         {
             var result = await _productService.GetAllBasicAsync();
             

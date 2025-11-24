@@ -63,8 +63,8 @@ namespace ZtpLab1.DataTransferObjects
         {
             var validationErrors = validationResults.Select(vr => new ValidationError
             {
-                Field = vr.MemberNames.FirstOrDefault() ?? "Unknown",
-                Message = vr.ErrorMessage ?? "Validation error"
+                Field = vr.MemberNames.FirstOrDefault() ?? "Nieznane",
+                Message = vr.ErrorMessage ?? "Błąd walidacji"
             });
 
             return new ApiResponse<T>

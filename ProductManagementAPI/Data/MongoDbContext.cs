@@ -124,7 +124,7 @@ namespace ZtpLab1.Data
         private async Task SeedForbiddenWordsAsync()
         {
             Console.WriteLine("Dodaję zabronione słowa...");
-            var forbiddenWords = new[]
+            var forbiddenWords = new ForbiddenWord[]
             {
                 new ForbiddenWord
                 {
@@ -186,7 +186,7 @@ namespace ZtpLab1.Data
         private async Task SeedProductsAsync()
         {
             Console.WriteLine("Dodaję produkty...");
-            var products = new[]
+            var products = new Product[]
             {
                 new Product
                 {

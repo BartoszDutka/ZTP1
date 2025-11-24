@@ -35,12 +35,12 @@ builder.Services.AddSwaggerGen(c =>
             // Sprawdzanie czy to endpoint historii produktów
             var actionName = api.ActionDescriptor.RouteValues["action"]?.ToString();
             if (actionName == "GetProductHistory" || actionName == "GetAllHistory")
-                return new[] { "📊 Historia Produktów (Ocena 4.5)" };
-            return new[] { "🛍️ Produkty (Ocena 3.0)" };
+                return ["📊 Historia Produktów (Ocena 4.5)"];
+            return ["🛍️ Produkty (Ocena 3.0)"];
         }
         if (api.ActionDescriptor.RouteValues["controller"]?.ToString() == "ForbiddenWords")
-            return new[] { "🚫 Zabronione Słowa (Ocena 3.5)" };
-        return new[] { "Inne" };
+            return ["🚫 Zabronione Słowa (Ocena 3.5)"];
+        return ["Inne"];
     });
     
     c.DocInclusionPredicate((name, api) => true);

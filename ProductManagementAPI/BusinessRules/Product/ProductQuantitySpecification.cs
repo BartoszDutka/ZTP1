@@ -19,7 +19,7 @@ namespace ZtpLab1.BusinessRules.Product
             {
                 errors.Add(new ValidationResult(
                     "Ilość produktu nie może być ujemna.",
-                    new[] { nameof(product.Quantity) }
+                    [nameof(product.Quantity)]
                 ));
             }
 

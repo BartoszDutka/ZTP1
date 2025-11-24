@@ -27,7 +27,7 @@ namespace ZtpLab1.BusinessRules.Product
             {
                 errors.Add(new ValidationResult(
                     "Kategoria produktu jest wymagana.",
-                    new[] { nameof(product.Category) }
+                    [nameof(product.Category)]
                 ));
                 return errors;
             }
@@ -37,7 +37,7 @@ namespace ZtpLab1.BusinessRules.Product
             {
                 errors.Add(new ValidationResult(
                     "Cena produktu musi być większa od 0.",
-                    new[] { nameof(product.Price) }
+                    [nameof(product.Price)]
                 ));
             }
 
@@ -50,14 +50,14 @@ namespace ZtpLab1.BusinessRules.Product
                 {
                     errors.Add(new ValidationResult(
                         $"Cena produktu w kategorii '{product.Category}' nie może być mniejsza niż {priceRange.Min:F2} PLN.",
-                        new[] { nameof(product.Price) }
+                        [nameof(product.Price)]
                     ));
                 }
                 else if (product.Price > priceRange.Max)
                 {
                     errors.Add(new ValidationResult(
                         $"Cena produktu w kategorii '{product.Category}' nie może być większa niż {priceRange.Max:F2} PLN.",
-                        new[] { nameof(product.Price) }
+                        [nameof(product.Price)]
                     ));
                 }
             }
@@ -65,7 +65,7 @@ namespace ZtpLab1.BusinessRules.Product
             {
                 errors.Add(new ValidationResult(
                     $"Nieznana kategoria produktu: '{product.Category}'. Dostępne kategorie: {string.Join(", ", _categoryPriceRanges.Keys)}.",
-                    new[] { nameof(product.Category) }
+                    [nameof(product.Category)]
                 ));
             }
 

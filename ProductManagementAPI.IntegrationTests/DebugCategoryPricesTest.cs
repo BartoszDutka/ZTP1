@@ -33,7 +33,7 @@ public class DebugCategoryPricesTest : IntegrationTestBase
             
             var createDto = new CreateProductDto
             {
-                Name = $"Test{DateTime.Now.Ticks % 10000}",
+                Name = $"Test_{Guid.NewGuid().ToString("N")[..6]}",
                 Category = testCase.Category,
                 Price = testCase.Price,
                 Quantity = 1

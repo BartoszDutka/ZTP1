@@ -92,7 +92,7 @@ namespace ZtpLab1.Services
                 {
                     return ApiResponse<Product>.CreateError(
                         $"Produkt o nazwie '{product.Name}' już istnieje.", 
-                        409 // Conflict
+                        409 // Konflikt
                     );
                 }
 
@@ -157,7 +157,7 @@ namespace ZtpLab1.Services
                 {
                     return ApiResponse<Product>.CreateError(
                         $"Produkt o nazwie '{product.Name}' już istnieje.", 
-                        409 // Conflict
+                        409 // Konflikt
                     );
                 }
 

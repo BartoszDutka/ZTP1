@@ -29,7 +29,7 @@ namespace ZtpLab1.Models
         /// </summary>
         [BsonRequired]
         [Required(ErrorMessage = "Typ operacji jest wymagany")]
-        public string OperationType { get; set; } = string.Empty; // CREATE, UPDATE, DELETE
+        public string OperationType { get; set; } = string.Empty; // UTWORZENIE, AKTUALIZACJA, USUNIĘCIE
 
         /// <summary>
         /// Stan produktu przed zmianą (null dla operacji CREATE).

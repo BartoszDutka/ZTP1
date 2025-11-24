@@ -21,7 +21,7 @@ namespace ZtpLab1.BusinessRules.Product
             {
                 errors.Add(new ValidationResult(
                     "Nazwa produktu jest wymagana.",
-                    new[] { nameof(product.Name) }
+                    [nameof(product.Name)]
                 ));
                 return errors; // Jeśli brak nazwy, dalsze sprawdzenia są bezcelowe
             }
@@ -33,14 +33,14 @@ namespace ZtpLab1.BusinessRules.Product
             {
                 errors.Add(new ValidationResult(
                     "Nazwa produktu musi mieć co najmniej 3 znaki.",
-                    new[] { nameof(product.Name) }
+                    [nameof(product.Name)]
                 ));
             }
             else if (trimmedName.Length > 20)
             {
                 errors.Add(new ValidationResult(
                     "Nazwa produktu nie może mieć więcej niż 20 znaków.",
-                    new[] { nameof(product.Name) }
+                    [nameof(product.Name)]
                 ));
             }
 
@@ -49,7 +49,7 @@ namespace ZtpLab1.BusinessRules.Product
             {
                 errors.Add(new ValidationResult(
                     "Nazwa produktu może zawierać tylko litery i cyfry (bez spacji i znaków specjalnych).",
-                    new[] { nameof(product.Name) }
+                    [nameof(product.Name)]
                 ));
             }
 
