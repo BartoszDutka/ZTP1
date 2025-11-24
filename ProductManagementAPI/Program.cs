@@ -31,7 +31,13 @@ builder.Services.AddSwaggerGen(c =>
     c.TagActionsBy(api =>
     {
         if (api.ActionDescriptor.RouteValues["controller"]?.ToString() == "Products")
+        {
+            // Sprawdzanie czy to endpoint historii produktów
+            var actionName = api.ActionDescriptor.RouteValues["action"]?.ToString();
+            if (actionName == "GetProductHistory" || actionName == "GetAllHistory")
+                return new[] { "📊 Historia Produktów (Ocena 4.5)" };
             return new[] { "🛍️ Produkty (Ocena 3.0)" };
+        }
         if (api.ActionDescriptor.RouteValues["controller"]?.ToString() == "ForbiddenWords")
             return new[] { "🚫 Zabronione Słowa (Ocena 3.5)" };
         return new[] { "Inne" };
@@ -50,10 +56,12 @@ builder.Services.AddSingleton<MongoDbContext>();
 // Repository Layer - abstrakcja dostępu do danych
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IForbiddenWordRepository, ForbiddenWordRepository>();
+builder.Services.AddScoped<IProductHistoryRepository, ProductHistoryRepository>();
 
 // Service Layer - logika biznesowa
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IForbiddenWordService, ForbiddenWordService>();
+builder.Services.AddScoped<IProductHistoryService, ProductHistoryService>();
 
 var app = builder.Build();
 

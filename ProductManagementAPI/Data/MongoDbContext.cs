@@ -11,6 +11,7 @@ namespace ZtpLab1.Data
     {
         private readonly IMongoCollection<Product> _products;
         private readonly IMongoCollection<ForbiddenWord> _forbiddenWords;
+        private readonly IMongoCollection<ProductHistory> _productHistory;
 
         /// <summary>
         /// Konstruktor inicjalizujący połączenie z MongoDB i konfigurujący kolekcje.
@@ -22,6 +23,7 @@ namespace ZtpLab1.Data
             var database = client.GetDatabase(settings.DatabaseName);
             _products = database.GetCollection<Product>(settings.ProductsCollectionName);
             _forbiddenWords = database.GetCollection<ForbiddenWord>(settings.ForbiddenWordsCollectionName);
+            _productHistory = database.GetCollection<ProductHistory>("ProductHistory");
 
             // Utworzenie unikalnego indeksu na polu Name przy starcie
             // To wymusza unikalność nazw produktów po stronie bazy danych
@@ -40,6 +42,19 @@ namespace ZtpLab1.Data
             };
             var forbiddenWordIndexModel = new CreateIndexModel<ForbiddenWord>(forbiddenWordIndexKeysDefinition, forbiddenWordIndexOptions);
             _forbiddenWords.Indexes.CreateOne(forbiddenWordIndexModel);
+
+            // Utworzenie indeksów dla kolekcji historii produktów
+            // Indeks na ProductId dla szybkiego wyszukiwania historii konkretnego produktu
+            var historyProductIdIndexKeysDefinition = Builders<ProductHistory>.IndexKeys.Ascending(h => h.ProductId);
+            var historyProductIdIndexModel = new CreateIndexModel<ProductHistory>(historyProductIdIndexKeysDefinition);
+            _productHistory.Indexes.CreateOne(historyProductIdIndexModel);
+
+            // Indeks kompozytowy na ProductId i ChangedAt dla szybkiego sortowania historii
+            var historyCompositeIndexKeysDefinition = Builders<ProductHistory>.IndexKeys
+                .Ascending(h => h.ProductId)
+                .Descending(h => h.ChangedAt);
+            var historyCompositeIndexModel = new CreateIndexModel<ProductHistory>(historyCompositeIndexKeysDefinition);
+            _productHistory.Indexes.CreateOne(historyCompositeIndexModel);
         }
 
         /// <summary>
@@ -51,6 +66,11 @@ namespace ZtpLab1.Data
         /// Dostęp do kolekcji zabronionych słów.
         /// </summary>
         public IMongoCollection<ForbiddenWord> ForbiddenWords => _forbiddenWords;
+
+        /// <summary>
+        /// Dostęp do kolekcji historii produktów.
+        /// </summary>
+        public IMongoCollection<ProductHistory> ProductHistory => _productHistory;
 
         /// <summary>
         /// Sprawdza czy nazwa produktu zawiera zabronione słowa.

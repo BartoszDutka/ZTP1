@@ -122,5 +122,46 @@ namespace ZtpLab1.Controllers
             
             return Ok(result);
         }
+
+        /// <summary>
+        /// GET /api/v1/products/history
+        /// Pobiera całą historię zmian wszystkich produktów w systemie.
+        /// Endpoint wyświetla wszystkie operacje CREATE, UPDATE i DELETE wykonane na produktach
+        /// wraz z informacjami o poprzednim i aktualnym stanie oraz datą modyfikacji.
+        /// </summary>
+        /// <returns>Lista wszystkich wpisów historii produktów w systemie</returns>
+        /// <response code="200">Pomyślnie pobrano historię wszystkich produktów</response>
+        /// <response code="500">Błąd serwera podczas pobierania historii</response>
+        [HttpGet("history")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<Models.ProductHistory>>>> GetAllHistory([FromServices] IProductHistoryService historyService)
+        {
+            var result = await historyService.GetAllHistoryAsync();
+            
+            if (!result.Success)
+            {
+                return StatusCode(result.ErrorCode ?? 500, result);
+            }
+            
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// GET /api/v1/products/{id}/history
+        /// Pobiera historię zmian dla określonego produktu.
+        /// </summary>
+        /// <param name="id">ID produktu</param>
+        /// <returns>Historia zmian produktu</returns>
+        [HttpGet("{id}/history")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<Models.ProductHistory>>>> GetProductHistory(string id, [FromServices] IProductHistoryService historyService)
+        {
+            var result = await historyService.GetProductHistoryAsync(id);
+            
+            if (!result.Success)
+            {
+                return StatusCode(result.ErrorCode ?? 500, result);
+            }
+            
+            return Ok(result);
+        }
     }
 }

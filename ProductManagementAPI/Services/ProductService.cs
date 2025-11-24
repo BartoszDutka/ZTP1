@@ -15,11 +15,13 @@ namespace ZtpLab1.Services
     {
         private readonly IProductRepository _productRepository;
         private readonly IForbiddenWordService _forbiddenWordService;
+        private readonly IProductHistoryService _historyService;
 
-        public ProductService(IProductRepository productRepository, IForbiddenWordService forbiddenWordService)
+        public ProductService(IProductRepository productRepository, IForbiddenWordService forbiddenWordService, IProductHistoryService historyService)
         {
             _productRepository = productRepository;
             _forbiddenWordService = forbiddenWordService;
+            _historyService = historyService;
         }
 
         public async Task<ApiResponse<IEnumerable<object>>> GetAllBasicAsync()
@@ -96,6 +98,10 @@ namespace ZtpLab1.Services
 
                 // Zapis w repozytorium
                 var createdProduct = await _productRepository.AddAsync(product);
+                
+                // Zapisanie historii utworzenia produktu
+                await _historyService.RecordCreateHistoryAsync(createdProduct);
+                
                 return ApiResponse<Product>.SuccessResponse(createdProduct, "Produkt został utworzony pomyślnie.");
             }
             catch (InvalidOperationException ex)
@@ -162,6 +168,9 @@ namespace ZtpLab1.Services
                     return ApiResponse<Product>.CreateError("Nie udało się zaktualizować produktu.", 500);
                 }
 
+                // Zapisanie historii aktualizacji produktu
+                await _historyService.RecordUpdateHistoryAsync(existingProduct, product);
+
                 return ApiResponse<Product>.SuccessResponse(product, "Produkt został zaktualizowany pomyślnie.");
             }
             catch (InvalidOperationException ex)
@@ -187,11 +196,21 @@ namespace ZtpLab1.Services
                     return ApiResponse.CreateErrorResponse("Identyfikator produktu jest wymagany.", 400);
                 }
 
-                var deleted = await _productRepository.DeleteAsync(id);
-                if (!deleted)
+                // Pobierz produkt przed usunięciem dla historii
+                var existingProduct = await _productRepository.GetByIdAsync(id);
+                if (existingProduct == null)
                 {
                     return ApiResponse.CreateErrorResponse($"Produkt o ID {id} nie został znaleziony.", 404);
                 }
+
+                var deleted = await _productRepository.DeleteAsync(id);
+                if (!deleted)
+                {
+                    return ApiResponse.CreateErrorResponse("Nie udało się usunąć produktu.", 500);
+                }
+
+                // Zapisanie historii usunięcia produktu
+                await _historyService.RecordDeleteHistoryAsync(existingProduct);
 
                 return ApiResponse.SuccessResponse("Produkt został usunięty pomyślnie.");
             }

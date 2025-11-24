@@ -864,3 +864,126 @@ Przy starcie aplikacji automatycznie dodawane są przykładowe:
 - 🚀 **Bonus**: Dodatkowe funkcjonalności (Swagger, pełne CRUD zabronionych słów)
 
 **Aplikacja jest w pełni funkcjonalna i gotowa do obrony!** 🏆
+
+---
+
+## 📊 Historia Produktów (Ocena 4.5)
+
+### **Śledzenie zmian produktów**
+
+System automatycznie śledzi wszystkie zmiany produktów i umożliwia przeglądanie pełnej historii operacji.
+
+### **Dostępne endpointy historii:**
+
+#### **1. GET /api/v1/products/history** - Cała historia wszystkich produktów
+```
+GET http://localhost:5048/api/v1/products/history
+```
+
+**Co zwraca:**
+- Pełną historię zmian **wszystkich produktów** w systemie
+- Wpisy posortowane chronologicznie (najnowsze pierwsze)
+- Szczegółowe informacje o każdej operacji (CREATE/UPDATE/DELETE)
+
+**Przykład odpowiedzi:**
+```json
+{
+  "success": true,
+  "message": "Pobrano całą historię produktów pomyślnie.",
+  "data": [
+    {
+      "id": "673c234567890abcdef12345",
+      "productId": "507f1f77bcf86cd799439011", 
+      "operationType": "UPDATE",
+      "previousState": {
+        "name": "LaptopDell",
+        "category": "elektronika",
+        "price": 3000,
+        "quantity": 10
+      },
+      "currentState": {
+        "name": "LaptopDell", 
+        "category": "elektronika",
+        "price": 3500,
+        "quantity": 8
+      },
+      "changedAt": "2024-11-24T14:30:00Z",
+      "changedFields": ["Price", "Quantity"]
+    },
+    {
+      "id": "673c234567890abcdef12346",
+      "productId": "507f1f77bcf86cd799439012",
+      "operationType": "CREATE", 
+      "previousState": null,
+      "currentState": {
+        "name": "KoszulkaNike",
+        "category": "odzież",
+        "price": 150,
+        "quantity": 25
+      },
+      "changedAt": "2024-11-24T12:15:00Z",
+      "changedFields": []
+    }
+  ]
+}
+```
+
+#### **2. GET /api/v1/products/{id}/history** - Historia konkretnego produktu
+```
+GET http://localhost:5048/api/v1/products/507f1f77bcf86cd799439011/history
+```
+
+**Co zwraca:**
+- Historię zmian **tylko dla wybranego produktu**
+- Chronologiczną listę wszystkich operacji na tym produkcie
+- Szczegóły poprzedniego i aktualnego stanu przy każdej zmianie
+
+### **Kiedy historia jest zapisywana:**
+
+1. **CREATE** - Przy dodawaniu nowego produktu
+   - `previousState`: null
+   - `currentState`: pełne dane nowego produktu
+   - `changedFields`: pusta lista
+
+2. **UPDATE** - Przy edycji istniejącego produktu  
+   - `previousState`: stan przed zmianą
+   - `currentState`: stan po zmianie
+   - `changedFields`: lista pól które się zmieniły (np. ["Price", "Quantity"])
+
+3. **DELETE** - Przy usuwaniu produktu
+   - `previousState`: ostatni stan przed usunięciem
+   - `currentState`: null
+   - `changedFields`: pusta lista
+
+### **Cechy systemu historii:**
+
+✅ **Automatyczne** - historia zapisuje się bez interwencji użytkownika
+✅ **Trwałe** - wszystkie dane przechowywane w MongoDB
+✅ **Bezpieczne** - błędy historii nie przerywają głównych operacji  
+✅ **Szczegółowe** - informacje o tym które pola zostały zmienione
+✅ **Chronologiczne** - wpisy sortowane według daty (najnowsze pierwsze)
+✅ **Kompletne** - pełny stan produktu przed i po zmianie
+
+### **Testowanie historii:**
+
+1. **Dodaj nowy produkt** → Sprawdź czy pojawił się wpis CREATE
+2. **Edytuj produkt** → Sprawdź czy pojawił się wpis UPDATE z listą zmienionych pól
+3. **Usuń produkt** → Sprawdź czy pojawił się wpis DELETE
+4. **Pobierz całą historię** → Sprawdź czy widzisz operacje na wszystkich produktach
+5. **Pobierz historię produktu** → Sprawdź czy widzisz tylko operacje na wybranym produkcie
+
+### **Architektura historii:**
+
+```
+Operacja na produkcie (CREATE/UPDATE/DELETE)
+        ↓
+ProductService automatycznie wywołuje ProductHistoryService  
+        ↓
+ProductHistoryService tworzy wpis ProductHistory
+        ↓ 
+ProductHistoryRepository zapisuje w MongoDB (kolekcja ProductHistory)
+        ↓
+Endpointy /history udostępniają dane użytkownikowi
+```
+
+**Historia produktów jest w pełni zaimplementowana zgodnie z wymaganiami oceny 4.5!** 📊
